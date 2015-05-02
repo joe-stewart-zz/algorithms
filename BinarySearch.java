@@ -10,9 +10,10 @@ public class BinarySearch {
         if(lo > hi)
             return -1;
         int mid = lo + (hi - lo) / 2;
-        if(key.compareTo(a[mid]) < 0)
+        int cmp = key.compareTo(a[mid]);
+        if(cmp < 0)
             return search(a, key, lo, mid - 1);
-        else if(key.compareTo(a[mid]) > 0)
+        else if(cmp > 0)
             return search(a, key, mid + 1, hi);
         else
             return mid;
