@@ -1,13 +1,13 @@
 import java.util.*;
 
-public class MaxPQ<Key> implements Iterable<Key> {
+public class MinPQ<Key> implements Iterable<Key> {
     private Key[] pq;
     private int N;
-    public MaxPQ(int initCap) {
+    public MinPQ(int initCap) {
         pq = (Key[]) new Object[initCap + 1];
         N = 0;
     }
-    public MaxPQ() {
+    public MinPQ() {
         this(1);
     }
     public boolean isEmpty() {
@@ -28,19 +28,19 @@ public class MaxPQ<Key> implements Iterable<Key> {
         pq[++N] = x;
         swim(N);
     }
-    public Key delMax() {
+    public Key delMin() {
         if(isEmpty())
             throw new NoSuchElementException("Priority queue underflow");
-        Key max = pq[1];
-        exch(1, N--);
+        exch(1, N);
+        Key min = pq[N--];
         sink(1);
         pq[N+1] = null;
         if((N > 0) && (N == (pq.length - 1) / 4))
             resize(pq.length / 2);
-        return max;
+        return min;
     }
     private void swim(int k) {
-        while(k > 1 && less(k/2, k)) {
+        while(k > 1 && greater(k/2, k)) {
             exch(k, k/2);
             k = k/2;
         }
@@ -48,16 +48,16 @@ public class MaxPQ<Key> implements Iterable<Key> {
     private void sink(int k) {
         while(2*k <= N) {
             int j = 2*k;
-            if(j < N && less(j, j+1))
+            if(j < N && greater(j, j+1))
                 j++;
-            if(!less(k, j))
+            if(!greater(k, j))
                 break;
             exch(k, j);
             k = j;
         }
     }
-    private boolean less(int i, int j) {
-        return ((Comparable<Key>) pq[i]).compareTo(pq[j]) < 0;
+    private boolean greater(int i, int j) {
+        return ((Comparable<Key>) pq[i]).compareTo(pq[j]) > 0;
     }
     private void exch(int i, int j) {
         Key swap = pq[i];
@@ -68,9 +68,9 @@ public class MaxPQ<Key> implements Iterable<Key> {
         return new HeapIterator();
     }
     private class HeapIterator implements Iterator<Key> {
-        private MaxPQ<Key> copy;
+        private MinPQ<Key> copy;
         public HeapIterator() {
-            copy = new MaxPQ<Key>(size());
+            copy = new MinPQ<Key>(size());
             for(int i = 1; i <= N; i++)
                 copy.insert(pq[i]);
         }
@@ -80,7 +80,7 @@ public class MaxPQ<Key> implements Iterable<Key> {
         public Key next() {
             if(!hasNext())
                 throw new NoSuchElementException();
-            return copy.delMax();
+            return copy.delMin();
         }
         public void remove() {
             throw new UnsupportedOperationException();
@@ -88,13 +88,14 @@ public class MaxPQ<Key> implements Iterable<Key> {
     }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        MaxPQ<String> pq = new MaxPQ<String>();
+        MinPQ<String> pq = new MinPQ<String>();
         while(scanner.hasNext()) {
             String item = scanner.next();
-            if(!item.equals("-"))
+            if(!item.equals("-")) {
                 pq.insert(item);
-            else if(!pq.isEmpty())
-                System.out.print(pq.delMax() + " ");
+            } else if(!pq.isEmpty()) {
+                System.out.print(pq.delMin() + " ");
+            }
         }
         System.out.println("(" + pq.size() + " left on pq)");
     }
